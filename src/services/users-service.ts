@@ -72,7 +72,7 @@ export const getCurrentUser = async (token: string) => {
 
   // Find user
   const user = await db.query.users.findFirst({
-    where: eq(users.id, session.userId),
+    where: eq(users.id, session.userId!),
   });
 
   if (!user) {
@@ -87,3 +87,14 @@ export const getCurrentUser = async (token: string) => {
     createdAt: user.createdAt,
   };
 };
+
+export const logoutUser = async (token: string) => {
+  const [result] = await db.delete(sessions).where(eq(sessions.token, token));
+
+  if (result.affectedRows === 0) {
+    throw new Error('unauthorized');
+  }
+
+  return { success: true };
+};
+
